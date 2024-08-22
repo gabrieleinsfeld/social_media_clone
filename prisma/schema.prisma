@@ -1,0 +1,112 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Session {
+  id        String   @id
+  sid       String   @unique
+  data      String
+  expiresAt   DateTime
+}
+
+model User {
+  id             String       @id @default(uuid())
+  username       String    @unique
+  email          String    @unique
+  password       String
+  profilePicture String?   // URL to profile picture
+  bio            String?   @db.Text
+  location       String?
+  dateJoined     DateTime  @default(now())
+  lastLogin      DateTime?
+  isActive       Boolean   @default(true)
+  isVerified     Boolean   @default(false)
+  
+  // Relationships
+  posts          Post[]
+  comments       Comment[]
+  likes          Like[]
+  followers      Follow[] @relation("following")
+  following      Follow[] @relation("followers")
+  media          Media[]
+}
+
+
+
+model Post {
+  id         String    @id @default(uuid())
+  content    String?   @db.Text
+  image      String?   // URL to image
+  video      String?   // URL to video
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  // Foreign Keys
+  userId     String
+  user       User      @relation(fields: [userId], references: [id])
+
+  // Relationships
+  comments   Comment[]
+  likes      Like[]
+  media      Media[]
+}
+
+model Comment {
+  id         String    @id @default(uuid())
+  content    String    @db.Text
+  createdAt  DateTime  @default(now())
+
+  // Foreign Keys
+  userId     String
+  postId     String
+  user       User      @relation(fields: [userId], references: [id])
+  post       Post      @relation(fields: [postId], references: [id])
+}
+
+model Like {
+  id         String    @id @default(uuid())
+  createdAt  DateTime  @default(now())
+
+  // Foreign Keys
+  userId     String
+  postId     String
+  user       User      @relation(fields: [userId], references: [id])
+  post       Post      @relation(fields: [postId], references: [id])
+}
+
+model Follow {
+  id            String    @id @default(uuid())
+  createdAt     DateTime  @default(now())
+
+  // Foreign Keys
+  followerId    String
+  followingId   String
+  follower      User      @relation("followers", fields: [followerId], references: [id])
+  following     User      @relation("following", fields: [followingId], references: [id])
+
+  @@unique([followerId, followingId])
+}
+
+model Media {
+  id         String    @id @default(uuid())
+  fileType   String
+  fileUrl    String
+  createdAt  DateTime  @default(now())
+
+  // Foreign Keys
+  userId     String
+  postId     String?
+  user       User      @relation(fields: [userId], references: [id])
+  post       Post?     @relation(fields: [postId], references: [id])
+}
