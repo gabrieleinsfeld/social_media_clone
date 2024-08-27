@@ -69,6 +69,13 @@ app.use(cors({ origin: "*" }));
 // ROUTES BEGIN
 const userRouter = require("./routes/userRouter");
 
+app.use((err, req, res, next) => {
+  console.error(err.stack); // Log the error stack trace (for debugging)
+  console.log("SUDUSHADIAUSHIUASHDIUHSAFIUASHF", sisdi);
+  res.status(err.status || 500).json({
+    message: err.message || "Internal Server Error",
+  });
+});
 app.get("/", (req, res) => {
   res.json({ message: "Hello" });
 });
@@ -100,7 +107,41 @@ app.get("/log-out", (req, res, next) => {
   });
 });
 
+app.post("/sign-up", async (req, res) => {
+  const { username, password, email } = req.body;
+
+  try {
+    const hashedPassword = bcryptjs.hash(
+      password,
+      10,
+      async (err, hashedPassword) => {
+        if (err) {
+          console.error(err);
+        } else {
+          const user = await prisma.user.create({
+            data: {
+              email,
+              username,
+              password: hashedPassword,
+            },
+          });
+          res.json({ user: user });
+        }
+      }
+    );
+  } catch (error) {
+    next(error);
+  }
+});
+
 app.use("/user", passport.authenticate("jwt", { session: false }), userRouter);
+
+app.use((error, req, res, next) => {
+  console.error(error.stack); // Log the error stack trace (for debugging)
+  res.status(error.status || 500).json({
+    message: error.message || "Internal Server Error",
+  });
+});
 
 const PORT = process.env.PORT || 3000;
 
