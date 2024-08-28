@@ -1,5 +1,4 @@
 const prisma = require("./prisma");
-const bcryptjs = require("bcryptjs");
 
 const getUserById = async (id) => {
   try {

@@ -39,7 +39,6 @@ model User {
   likes          Like[]
   followers      Follow[] @relation("following")
   following      Follow[] @relation("followers")
-  media          Media[]
 }
 
 
@@ -59,7 +58,6 @@ model Post {
   // Relationships
   comments   Comment[]
   likes      Like[]
-  media      Media[]
 }
 
 model Comment {
@@ -98,15 +96,4 @@ model Follow {
   @@unique([followerId, followingId])
 }
 
-model Media {
-  id         String    @id @default(uuid())
-  fileType   String
-  fileUrl    String
-  createdAt  DateTime  @default(now())
 
-  // Foreign Keys
-  userId     String
-  postId     String?
-  user       User      @relation(fields: [userId], references: [id])
-  post       Post?     @relation(fields: [postId], references: [id])
-}

@@ -68,6 +68,8 @@ app.use(cors({ origin: "*" }));
 
 // ROUTES BEGIN
 const userRouter = require("./routes/userRouter");
+const commentRouter = require("./routes/commentRouter");
+const postRouter = require("./routes/postRouter");
 
 app.use((err, req, res, next) => {
   console.error(err.stack); // Log the error stack trace (for debugging)
@@ -135,6 +137,12 @@ app.post("/sign-up", async (req, res) => {
 });
 
 app.use("/user", passport.authenticate("jwt", { session: false }), userRouter);
+app.use(
+  "/comment",
+  passport.authenticate("jwt", { session: false }),
+  commentRouter
+);
+app.use("/post", passport.authenticate("jwt", { session: false }), postRouter);
 
 app.use((error, req, res, next) => {
   console.error(error.stack); // Log the error stack trace (for debugging)

@@ -1,6 +1,6 @@
 const { Router } = require("express");
 const userRouter = Router();
-const db = require("../db/queries");
+const db = require("../db/userQueries");
 
 userRouter.get("/", (req, res) => {
   const user = req.user;
