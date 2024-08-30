@@ -12,10 +12,15 @@ const getUserById = async (id) => {
   }
 };
 
-const getPosts = async () => {
+const getPosts = async (id) => {
   try {
-    const post = await prisma.post.findMany({ include: { comments: true } });
-    return post;
+    const posts = await prisma.post.findMany({
+      include: { comments: true, likes: true },
+    });
+    return posts.map((post) => {
+      const liked = post.likes.some((like) => like.userId === id); // Check if the user has liked the post
+      return { ...post, liked }; // Return the modified post object with the 'liked' field
+    });
   } catch (error) {
     throw new Error("Error getting posts:", error);
   }

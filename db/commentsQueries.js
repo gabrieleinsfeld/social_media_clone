@@ -9,7 +9,20 @@ const getCommentsByPostId = async (postId) => {
     });
     return comments;
   } catch (error) {
-    throw new Error("Error creating comment:", error);
+    throw new Error(error);
+  }
+};
+
+const getCommentId = async (id) => {
+  try {
+    const comment = await prisma.comment.findUnique({
+      where: {
+        id,
+      },
+    });
+    return comment;
+  } catch (error) {
+    throw new Error(error);
   }
 };
 
@@ -24,7 +37,7 @@ const createComment = async (content, postId, userId) => {
     });
     return comment;
   } catch (error) {
-    throw new Error("Error creating comment:", error);
+    throw new Error(error);
   }
 };
 
@@ -74,4 +87,5 @@ module.exports = {
   createComment,
   updateComment,
   deleteComment,
+  getCommentId,
 };

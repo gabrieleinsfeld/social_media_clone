@@ -81,6 +81,7 @@ model Like {
   postId     String
   user       User      @relation(fields: [userId], references: [id])
   post       Post      @relation(fields: [postId], references: [id])
+  @@unique([userId, postId]) // Ensure a user can like a post only once
 }
 
 model Follow {

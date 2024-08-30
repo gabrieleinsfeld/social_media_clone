@@ -8,6 +8,12 @@ commentRouter.get("/:id", async (req, res) => {
   res.json({ comments });
 });
 
+commentRouter.get("/id/:id", async (req, res) => {
+  const id = req.params.id;
+  const comment = await db.getCommentId(id);
+  res.json({ comment });
+});
+
 commentRouter.post("/", async (req, res, next) => {
   const { content, postId } = req.body;
   const userId = req.user.id;

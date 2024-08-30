@@ -6,8 +6,9 @@ const multer = require("multer");
 const upload = multer({ dest: "../uploads" }); // Temporary storage directory
 
 postRouter.get("/all", async (req, res, next) => {
+  const id = req.user.id;
   try {
-    const posts = await db.getPosts();
+    const posts = await db.getPosts(id);
     res.json({ posts });
   } catch (error) {
     next(error);
@@ -34,6 +35,17 @@ postRouter.get("/find/:postId", async (req, res, next) => {
   }
 });
 postRouter.post("/", upload.single("newFile"), postFileController.uploadFile);
+
+postRouter.post("/mock", async (req, res, next) => {
+  const { image, content } = req.body;
+  const userId = req.user.id;
+  try {
+    const post = await db.createPost(image, content, userId);
+    res.json({ post });
+  } catch (error) {
+    next(error);
+  }
+});
 
 postRouter.put("/", async (req, res, next) => {
   const { postId, content } = req.body;
