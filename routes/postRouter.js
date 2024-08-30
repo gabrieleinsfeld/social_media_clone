@@ -37,8 +37,9 @@ postRouter.post("/", upload.single("newFile"), postFileController.uploadFile);
 
 postRouter.put("/", async (req, res, next) => {
   const { postId, content } = req.body;
+  const userId = req.user.id;
   try {
-    const post = await db.updatePost(postId, content);
+    const post = await db.updatePost(postId, content, userId);
     res.json({ post });
   } catch (error) {
     next(error);
@@ -47,8 +48,9 @@ postRouter.put("/", async (req, res, next) => {
 
 postRouter.delete("/:postId", async (req, res, next) => {
   const postId = req.params.postId;
+  const userId = req.user.id;
   try {
-    const post = await db.deletePost(postId);
+    const post = await db.deletePost(postId, userId);
     res.json({ post });
   } catch (error) {
     next(error);

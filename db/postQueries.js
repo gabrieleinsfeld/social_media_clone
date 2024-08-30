@@ -41,7 +41,7 @@ const getPostByPostId = async (id) => {
     });
     return post;
   } catch (error) {
-    throw new Error("Error getting post :", error);
+    throw new Error("Error getting post comment:", error);
   }
 };
 
@@ -62,7 +62,16 @@ const createPost = async (image, content, userId) => {
 
 const updatePost = async (id, content) => {
   try {
-    const post = await prisma.post.update({
+    const post = await prisma.post.findUnique({
+      where: { id },
+    });
+    if (!post) {
+      throw new Error("Post not found");
+    }
+    if (post.userId !== userId) {
+      throw new Error("You are not authorized to update this post");
+    }
+    const updatedPost = await prisma.post.update({
       where: {
         id,
       },
@@ -70,20 +79,29 @@ const updatePost = async (id, content) => {
         content,
       },
     });
-    return post;
+    return updatedPost;
   } catch (error) {
-    throw new Error("Error updating post:", error);
+    throw new Error(error);
   }
 };
 
-const deletePost = async (id) => {
+const deletePost = async (id, userId) => {
   try {
-    const post = await prisma.post.delete({
+    const post = await prisma.post.findUnique({
       where: { id },
     });
-    return post;
+    if (!post) {
+      throw new Error("Post not found");
+    }
+    if (post.userId !== userId) {
+      throw new Error("You are not authorized to update this post");
+    }
+    const updatedPost = await prisma.post.delete({
+      where: { id },
+    });
+    return updatedPost;
   } catch (error) {
-    throw new Error("Error deleting post:", error);
+    throw new Error(error);
   }
 };
 
