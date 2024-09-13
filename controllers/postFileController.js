@@ -12,7 +12,8 @@ require("dotenv").config();
 const multer = require("multer");
 const fs = require("fs"); // Required to remove the file after uploading
 
-const upload = multer({ dest: "../uploads" }); // Temporary storage directory
+// const upload = multer({ dest: "../uploads" }); // Temporary storage directory
+const upload = multer({ dest: "/tmp" });
 async function uploadFile(req, res, next) {
   const content = req.body.content;
   const userId = req.user.id;
