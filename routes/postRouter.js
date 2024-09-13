@@ -3,7 +3,7 @@ const postRouter = Router();
 const db = require("../db/postQueries");
 const postFileController = require("../controllers/postFileController");
 const multer = require("multer");
-const upload = multer({ dest: "../uploads" }); // Temporary storage directory
+const upload = multer({ dest: "/temp" }); // Temporary storage directory
 
 postRouter.get("/all", async (req, res, next) => {
   const id = req.user.id;
