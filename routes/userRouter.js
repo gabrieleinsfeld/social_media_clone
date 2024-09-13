@@ -6,6 +6,22 @@ userRouter.get("/", (req, res) => {
   const user = req.user;
   res.json({ user });
 });
+userRouter.get("/search", async (req, res) => {
+  const { q } = req.query; // Get the query from the request
+
+  if (!q) {
+    return res.status(400).json({ error: "Query parameter q is required" });
+  }
+
+  try {
+    const results = await db.handleSearch(q, req.user.id);
+
+    res.json(results);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
 
 userRouter.get("/all", async (req, res) => {
   const user = await db.getAllUsers();

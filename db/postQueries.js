@@ -15,7 +15,14 @@ const getUserById = async (id) => {
 const getPosts = async (id) => {
   try {
     const posts = await prisma.post.findMany({
-      include: { comments: true, likes: true },
+      orderBy: {
+        createdAt: "desc", // 'asc' for oldest first, 'desc' for newest first
+      },
+      include: {
+        comments: true,
+        likes: true,
+        user: { include: { posts: true, followers: true, following: true } },
+      },
     });
     return posts.map((post) => {
       const liked = post.likes.some((like) => like.userId === id); // Check if the user has liked the post
@@ -101,6 +108,9 @@ const deletePost = async (id, userId) => {
     if (post.userId !== userId) {
       throw new Error("You are not authorized to update this post");
     }
+    await prisma.like.deleteMany({
+      where: { postId: id },
+    });
     const updatedPost = await prisma.post.delete({
       where: { id },
     });

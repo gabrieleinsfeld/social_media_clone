@@ -48,21 +48,25 @@ const getUsersWhoLikedPost = async (postId) => {
   }
 };
 
-const deleteLike = async (id, userId) => {
+const deleteLike = async (postId, userId) => {
   try {
-    const like = await prisma.like.findUnique({
-      where: { id },
+    const like = await prisma.like.findFirst({
+      where: {
+        postId,
+        userId,
+      },
     });
+
     if (!like) {
       throw new Error("Like not found");
     }
-    if (like.userId !== userId) {
-      throw new Error("You are not authorized to delete this like");
-    }
+
+    // Delete the like
     const deletedLike = await prisma.like.delete({
-      where: { id },
+      where: {
+        id: like.id, // Delete by the like's id
+      },
     });
-    return deletedLike;
   } catch (error) {
     throw new Error(error);
   }

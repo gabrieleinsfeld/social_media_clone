@@ -32,7 +32,7 @@ model User {
   lastLogin      DateTime?
   isActive       Boolean   @default(true)
   isVerified     Boolean   @default(false)
-  
+  completeName   String    
   // Relationships
   posts          Post[]
   comments       Comment[]

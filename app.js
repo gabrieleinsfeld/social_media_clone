@@ -46,6 +46,15 @@ passport.use(
       try {
         const user = await prisma.user.findUnique({
           where: { id: jwtPayload.userId },
+          include: {
+            posts: {
+              orderBy: {
+                createdAt: "desc", // 'asc' for oldest first, 'desc' for newest first
+              },
+            },
+            followers: true,
+            following: true,
+          },
         });
         if (user) {
           return done(null, user);
@@ -74,7 +83,6 @@ const likeRouter = require("./routes/likeRouter");
 
 app.use((err, req, res, next) => {
   console.error(err.stack); // Log the error stack trace (for debugging)
-  console.log("SUDUSHADIAUSHIUASHDIUHSAFIUASHF", sisdi);
   res.status(err.status || 500).json({
     message: err.message || "Internal Server Error",
   });
@@ -86,7 +94,10 @@ app.get("/", (req, res) => {
 app.post("/log-in", async (req, res) => {
   const { username, password } = req.body;
 
-  const user = await prisma.user.findUnique({ where: { username } });
+  const user = await prisma.user.findUnique({
+    where: { username },
+    include: { posts: true },
+  });
 
   if (!user || !(await bcryptjs.compare(password, user.password))) {
     return res.status(401).json({ message: "Invalid credentials" });
@@ -111,7 +122,7 @@ app.get("/log-out", (req, res, next) => {
 });
 
 app.post("/sign-up", async (req, res) => {
-  const { username, password, email } = req.body;
+  const { username, password, email, completeName } = req.body;
 
   try {
     const hashedPassword = bcryptjs.hash(
@@ -123,6 +134,7 @@ app.post("/sign-up", async (req, res) => {
         } else {
           const user = await prisma.user.create({
             data: {
+              completeName,
               email,
               username,
               password: hashedPassword,
@@ -135,6 +147,10 @@ app.post("/sign-up", async (req, res) => {
   } catch (error) {
     next(error);
   }
+});
+
+app.get("/test", (req, res) => {
+  res.json({ user: { username: "Gabriel", email: "gabe@gmail.com" } });
 });
 
 app.use("/user", passport.authenticate("jwt", { session: false }), userRouter);

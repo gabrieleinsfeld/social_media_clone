@@ -112,6 +112,27 @@ const deleteUser = async (id) => {
   }
 };
 
+const handleSearch = async (q, userId) => {
+  try {
+    const results = await prisma.user.findMany({
+      where: {
+        username: { startsWith: q, mode: "insensitive" },
+        id: {
+          not: userId, // Exclude the current user
+        },
+      },
+      include: {
+        posts: true,
+        followers: true,
+        following: true,
+      },
+    });
+    return results;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
 const isFollowing = async (followerId, followingId) => {
   try {
     const follow = await prisma.follow.findFirst({
@@ -157,4 +178,5 @@ module.exports = {
   deleteUser,
   deleteFollowing,
   isFollowing,
+  handleSearch,
 };
